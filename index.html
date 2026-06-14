@@ -2,14 +2,17 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Trang Web Nghe Nhạc BeeStation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Web Nghe Nhạc Orange Bee</title>
     <style>
-        body { font-family: sans-serif; background: #121212; color: white; text-align: center; padding: 50px; }
-        .player-container { background: #1e1e1e; padding: 30px; border-radius: 15px; display: inline-block; }
-        audio { margin-top: 20px; width: 100%; }
-        ul { list-style: none; padding: 0; }
-        li { padding: 10px; background: #282828; margin: 5px 0; cursor: pointer; border-radius: 5px; }
-        li:hover { background: #1db954; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: white; text-align: center; padding: 40px 20px; }
+        .player-container { background: #1e1e1e; padding: 30px; border-radius: 20px; display: inline-block; width: 100%; max-width: 400px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+        h2 { margin-bottom: 20px; color: #ff6b35; }
+        ul { list-style: none; padding: 0; margin: 0 0 25px 0; }
+        li { padding: 15px; background: #282828; margin: 8px 0; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; font-weight: 500; border: 1px solid #333; }
+        li:hover { background: #383838; border-color: #ff6b35; }
+        li.active { background: #ff6b35; color: black; font-weight: bold; border-color: #ff6b35; }
+        audio { width: 100%; margin-top: 10px; border-radius: 30px; }
     </style>
 </head>
 <body>
@@ -17,24 +20,43 @@
 <div class="player-container">
     <h2>Trang Web Nghe Nhạc Orange Bee</h2>
     <ul id="playlist">
-        <!-- Thay link public của bạn vào phần data-src -->
-        <li data-src="https://drive.google.com/drive/folders/1GmOA8H_VVWm3pNSN9PDGR3vQzPFo8MBG">Hạt Mưa Vương Vấn</li>
-        <li data-src="https://drive.google.com/uc?export=download&id=1YYsfAPBsiMuyrOjQUGDFq4g-31V5XNbP">Tình Đơn Phương</li>
-        <li data-src="https://drive.google.com/uc?export=download&id=1AGvKsczsxm1AQRDT6xLfCtBOeOZ4bewh">Anh Đau Từ Lúc Em Đi</li>
+        <li class="active" data-id="111zhly2b3QBSXE8ydb2tLDMPGQidcC_L">Hạt Mưa Vương Vấn</li>
+        <li data-id="MÃ_ID_BÀI_TÌNH_ĐƠN_PHƯƠNG">Tình Đơn Phương</li>
+        <li data-id="MÃ_ID_BÀI_ANH_ĐAU_TỪ_LÚC_EM_ĐI">Anh Đau Từ Lúc Em Đi</li>
     </ul>
-    <audio id="audio-player" controls></audio>
+    <audio id="audio-player" controls preload="metadata"></audio>
 </div>
 
 <script>
     const player = document.getElementById('audio-player');
     const songs = document.querySelectorAll('#playlist li');
 
+    // Hàm tạo link stream chuẩn từ ID Google Drive
+    function getStreamUrl(id) {
+        return `https://www.googleapis.com/drive/v3/files/${id}?alt=media`;
+    }
+
+    // Tự động nạp bài đầu tiên khi load trang
+    const firstSong = document.querySelector('#playlist li.active');
+    if (firstSong) {
+        player.src = getStreamUrl(firstSong.getAttribute('data-id'));
+    }
+
+    // Xử lý sự kiện khi click chọn bài
     songs.forEach(song => {
         song.addEventListener('click', function() {
-            player.src = this.getAttribute('data-src');
-            player.play();
+            // Xóa trạng thái active của bài cũ
+            songs.forEach(s => s.classList.remove('active'));
+            // Thêm trạng thái active cho bài vừa click
+            this.classList.add('active');
+            
+            // Đổi nguồn nhạc và phát
+            const songId = this.getAttribute('data-id');
+            player.src = getStreamUrl(songId);
+            player.play().catch(error => console.log("Chờ người dùng tương tác để phát:", error));
         });
     });
 </script>
 </body>
 </html>
+
