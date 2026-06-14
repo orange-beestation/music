@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Trang Web Nghe Nhạc BeeStation</title>
+    <style>
+        body { font-family: sans-serif; background: #121212; color: white; text-align: center; padding: 50px; }
+        .player-container { background: #1e1e1e; padding: 30px; border-radius: 15px; display: inline-block; }
+        audio { margin-top: 20px; width: 100%; }
+        ul { list-style: none; padding: 0; }
+        li { padding: 10px; background: #282828; margin: 5px 0; cursor: pointer; border-radius: 5px; }
+        li:hover { background: #1db954; }
+    </style>
+</head>
+<body>
+
+<div class="player-container">
+    <h2>My BeeStation Playlist</h2>
+    <ul id="playlist">
+        <!-- Thay link public của bạn vào phần data-src -->
+        <li data-src="https://DƯỜNG_DẪN_FILE_NHẠC_BEE_STATION_1.mp3">Bài Hát 1</li>
+        <li data-src="https://DƯỜNG_DẪN_FILE_NHẠC_BEE_STATION_2.mp3">Bài Hát 2</li>
+    </ul>
+    <audio id="audio-player" controls></audio>
+</div>
+
+<script>
+    const player = document.getElementById('audio-player');
+    const songs = document.querySelectorAll('#playlist li');
+
+    songs.forEach(song => {
+        song.addEventListener('click', function() {
+            player.src = this.getAttribute('data-src');
+            player.play();
+        });
+    });
+</script>
+</body>
+</html>
