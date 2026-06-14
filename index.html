@@ -20,9 +20,9 @@
 <div class="player-container">
     <h2>Trang Web Nghe Nhạc Orange Bee</h2>
     <ul id="playlist">
-        <li class="active" data-id="https://drive.google.com/file/d/111zhly2b3QBSXE8ydb2tLDMPGQidcC_L/view">Hạt Mưa Vương Vấn</li>
-        <li data-id="MÃ_ID_BÀI_TÌNH_ĐƠN_PHƯƠNG">Tình Đơn Phương</li>
-        <li data-id="MÃ_ID_BÀI_ANH_ĐAU_TỪ_LÚC_EM_ĐI">Anh Đau Từ Lúc Em Đi</li>
+        <li class="active" data-id="11Izhly2b3QBSXE8ydb2tLDMPGqidcC_L">Hạt Mưa Vương Vấn</li>
+        <li data-id="MÃ_ID_BÀI_TÌNH_ĐƠN_PHƯƠNG_THẬT">Tình Đơn Phương</li>
+        <li data-id="MÃ_ID_BÀI_ANH_ĐAU_TỪ_LÚC_EM_ĐI_THẬT">Anh Đau Từ Lúc Em Đi</li>
     </ul>
     <audio id="audio-player" controls preload="metadata"></audio>
 </div>
@@ -31,32 +31,38 @@
     const player = document.getElementById('audio-player');
     const songs = document.querySelectorAll('#playlist li');
 
-    // Hàm tạo link stream chuẩn từ ID Google Drive
+    // Cấu trúc link stream vượt tường lửa Google Drive tốt nhất cho web
     function getStreamUrl(id) {
-        return `https://www.googleapis.com/drive/v3/files/${id}?alt=media`;
+        return `https://lh3.googleusercontent.com/d/${id}`;
     }
 
-    // Tự động nạp bài đầu tiên khi load trang
+    // Tự động nạp bài đầu tiên
     const firstSong = document.querySelector('#playlist li.active');
     if (firstSong) {
-        player.src = getStreamUrl(firstSong.getAttribute('data-id'));
+        const firstId = firstSong.getAttribute('data-id');
+        if(firstId && !firstId.includes("MÃ_ID")) {
+            player.src = getStreamUrl(firstId);
+        }
     }
 
-    // Xử lý sự kiện khi click chọn bài
+    // Xử lý click chọn bài
     songs.forEach(song => {
         song.addEventListener('click', function() {
-            // Xóa trạng thái active của bài cũ
+            const songId = this.getAttribute('data-id');
+            
+            // Nếu chưa thay ID thật thì không chạy
+            if (!songId || songId.includes("MÃ_ID")) {
+                alert("Bạn chưa cấu hình mã ID Google Drive thật cho bài hát này!");
+                return;
+            }
+
             songs.forEach(s => s.classList.remove('active'));
-            // Thêm trạng thái active cho bài vừa click
             this.classList.add('active');
             
-            // Đổi nguồn nhạc và phát
-            const songId = this.getAttribute('data-id');
             player.src = getStreamUrl(songId);
-            player.play().catch(error => console.log("Chờ người dùng tương tác để phát:", error));
+            player.play().catch(error => console.log("Yêu cầu tương tác: ", error));
         });
     });
 </script>
 </body>
 </html>
-
