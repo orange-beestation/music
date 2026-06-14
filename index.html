@@ -5,14 +5,77 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trang Web Nghe Nhạc Orange Bee</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: white; text-align: center; padding: 40px 20px; }
-        .player-container { background: #1e1e1e; padding: 30px; border-radius: 20px; display: inline-block; width: 100%; max-width: 400px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
-        h2 { margin-bottom: 20px; color: #ff6b35; }
-        ul { list-style: none; padding: 0; margin: 0 0 25px 0; }
-        li { padding: 15px; background: #282828; margin: 8px 0; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; font-weight: 500; border: 1px solid #333; }
-        li:hover { background: #383838; border-color: #ff6b35; }
-        li.active { background: #ff6b35; color: black; font-weight: bold; border-color: #ff6b35; }
-        audio { width: 100%; margin-top: 10px; border-radius: 30px; }
+        *, *::before, *::after { box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #121212; 
+            color: #ffffff; 
+            text-align: center; 
+            padding: 40px 20px; 
+            margin: 0;
+        }
+        .player-container { 
+            background: #1e1e1e; 
+            padding: 30px; 
+            border-radius: 20px; 
+            display: inline-block; 
+            width: 100%; 
+            max-width: 400px; 
+            box-shadow: 0 8px 32px rgba(0,0,0,0.6); 
+        }
+        h2 { 
+            margin-top: 0;
+            margin-bottom: 25px; 
+            color: #ff6b35; 
+            font-size: 1.4rem;
+        }
+        ul { 
+            list-style: none; 
+            padding: 0; 
+            margin: 0 0 25px 0; 
+        }
+        li { 
+            padding: 15px; 
+            background: #282828; 
+            margin: 10px 0; 
+            cursor: pointer; 
+            border-radius: 10px; 
+            transition: all 0.2s ease; 
+            font-weight: 500; 
+            border: 1px solid #333;
+            text-align: left;
+            position: relative;
+            padding-left: 45px;
+        }
+        li::before {
+            content: "▶";
+            position: absolute;
+            left: 18px;
+            color: #ff6b35;
+            font-size: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        li:hover { 
+            background: #333333; 
+            border-color: #ff6b35; 
+        }
+        li.active { 
+            background: #ff6b35; 
+            color: #000000; 
+            font-weight: bold; 
+            border-color: #ff6b35; 
+        }
+        li.active::before {
+            color: #000000;
+            content: "⏸";
+        }
+        audio { 
+            width: 100%; 
+            margin-top: 10px; 
+            border-radius: 30px; 
+            outline: none;
+        }
     </style>
 </head>
 <body>
@@ -20,9 +83,9 @@
 <div class="player-container">
     <h2>Trang Web Nghe Nhạc Orange Bee</h2>
     <ul id="playlist">
-        <li class="active" data-id="11Izhly2b3QBSXE8ydb2tLDMPGqidcC_L">Hạt Mưa Vương Vấn</li>
-        <li data-id="MÃ_ID_BÀI_TÌNH_ĐƠN_PHƯƠNG_THẬT">Tình Đơn Phương</li>
-        <li data-id="MÃ_ID_BÀI_ANH_ĐAU_TỪ_LÚC_EM_ĐI_THẬT">Anh Đau Từ Lúc Em Đi</li>
+        <li class="active" data-src="hat-mua-vuong-van.mp3">Hạt Mưa Vương Vấn</li>
+        <li data-src="tinh-don-phuong.mp3">Tình Đơn Phương</li>
+        <li data-src="anh-dau-tu-luc-em-di.mp3">Anh Đau Từ Lúc Em Đi</li>
     </ul>
     <audio id="audio-player" controls preload="metadata"></audio>
 </div>
@@ -31,37 +94,35 @@
     const player = document.getElementById('audio-player');
     const songs = document.querySelectorAll('#playlist li');
 
-    // Cấu trúc link stream vượt tường lửa Google Drive tốt nhất cho web
-    function getStreamUrl(id) {
-        return `https://lh3.googleusercontent.com/d/${id}`;
-    }
-
-    // Tự động nạp bài đầu tiên
+    // Nạp bài đầu tiên khi load trang
     const firstSong = document.querySelector('#playlist li.active');
     if (firstSong) {
-        const firstId = firstSong.getAttribute('data-id');
-        if(firstId && !firstId.includes("MÃ_ID")) {
-            player.src = getStreamUrl(firstId);
-        }
+        player.src = firstSong.getAttribute('data-src');
     }
 
-    // Xử lý click chọn bài
+    // Xử lý click đổi bài
     songs.forEach(song => {
         song.addEventListener('click', function() {
-            const songId = this.getAttribute('data-id');
-            
-            // Nếu chưa thay ID thật thì không chạy
-            if (!songId || songId.includes("MÃ_ID")) {
-                alert("Bạn chưa cấu hình mã ID Google Drive thật cho bài hát này!");
-                return;
-            }
-
             songs.forEach(s => s.classList.remove('active'));
             this.classList.add('active');
             
-            player.src = getStreamUrl(songId);
-            player.play().catch(error => console.log("Yêu cầu tương tác: ", error));
+            player.src = this.getAttribute('data-src');
+            player.play().catch(err => console.log("Cần click chuột vào trang để kích hoạt trình phát:", err));
         });
+    });
+
+    // TỰ ĐỘNG CHUYỂN BÀI KHI HẾT NHẠC
+    player.addEventListener('ended', function() {
+        let currentActive = document.querySelector('#playlist li.active');
+        let nextSong = currentActive.nextElementSibling;
+        
+        if (!nextSong) {
+            nextSong = songs[0]; // Nếu là bài cuối cùng thì quay lại bài đầu tiên
+        }
+        
+        if (nextSong) {
+            nextSong.click(); // Kích hoạt sự kiện bấm vào bài tiếp theo
+        }
     });
 </script>
 </body>
